@@ -1,0 +1,28 @@
+# port
+server:
+  port: 9000
+
+# MySQL
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/schemaname
+    username: username
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+# app properties
+app:
+  security:
+    jwt:
+      secret-key: d7e3c737696c3b9241bbde3fdfb664b515f36bb634da1afac2e45a85faef6c37
+      access-token-expiration: 300000
+      refresh-token-expiration: 6000000
