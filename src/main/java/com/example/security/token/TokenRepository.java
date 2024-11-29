@@ -1,6 +1,5 @@
 package com.example.security.token;
 
-import com.example.security.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -22,6 +23,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final CustomLogoutHandler customLogoutHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -46,6 +48,15 @@ public class SecurityConfig {
         http
                 .cors((corsConfigurer)->
                         corsConfigurer.configurationSource(corsConfigurationSource()));
+
+        // logout 설정
+        http
+                .logout(log->log.logoutUrl("/api/v1/auth/logout")
+                        .addLogoutHandler(customLogoutHandler)
+                        .logoutSuccessHandler(
+                                (request, response, authentication) -> SecurityContextHolder.clearContext()
+                        )
+                );
 
         return http.build();
     }

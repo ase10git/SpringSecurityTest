@@ -41,6 +41,7 @@ function Demo() {
         }
     }
 
+    // secured endpoint의 자원 요청하기
     const getResource = async () => {
         // 자원 요청
         try {
@@ -48,6 +49,14 @@ function Demo() {
             setHello(data);
         } catch (error) {
             setHello("Not Authorized");
+        }
+    }
+
+    // 로그아웃
+    const logout = async () => {
+        try {
+            await axios.get("/auth/logout");
+        } catch (error) {
         }
     }
 
@@ -59,6 +68,9 @@ function Demo() {
     return(
         <div>
             <h2>Demo Page</h2>
+            <button onClick={()=>{navigate("/register")}}>회원가입</button>
+            <button onClick={()=>{navigate("/login")}}>로그인</button>
+            <button onClick={logout}>로그아웃</button>
             <p>{hello}</p>
         </div>
     )

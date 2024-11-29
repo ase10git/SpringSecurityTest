@@ -66,7 +66,7 @@ public class AuthenticationService {
         return new ResponseEntity<>(response, header, HttpStatus.OK);
     }
 
-    // 인증 확인
+    // 인증 확인 - 로그인
     @Transactional
     public ResponseEntity<AuthenticationResponse> authenticate(
             AuthenticationRequest request

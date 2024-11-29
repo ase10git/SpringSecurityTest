@@ -33,10 +33,9 @@ public class AuthenticationController {
 
     // 재발급
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthenticationResponse> authenticate (
+    public ResponseEntity<AuthenticationResponse> refreshToken (
         HttpServletRequest request
     ) {
         return service.refreshToken(request);
     }
-
 }
