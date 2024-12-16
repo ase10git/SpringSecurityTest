@@ -35,8 +35,8 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 역할 List를 반환
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        // 권한 List를 반환
+        return role.getAuthorities();
     }
 
     @Override

@@ -1,9 +1,14 @@
 package com.example.security.config;
 
+import com.example.security.user.Permission;
+import com.example.security.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,21 +24,49 @@ import java.util.Collections;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity // @PreAuthorize를 사용하기 위해 필요
+// 최신 버전에선 prePostEnabled = true가 기본 설정이나
+// 구버전에선 prePostEnabled = false가 기본 설정
+// 구버전에선 @EnableGlobalMethodSecurity(prePostEnabled = true)로 사용
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final CustomLogoutHandler customLogoutHandler;
 
+    private static final Role ADMIN = Role.ADMIN;
+    private static final Role MANAGER = Role.MANAGER;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
 
         http
                 // session stateless로 인해 꺼 둠  
                 .csrf((auth)->auth.disable())
+
                 .authorizeRequests()
+
+                // 요청 제어
                 .requestMatchers("/api/v1/auth/**") // 나열된 요청들은  
-                .permitAll() // 모두 허용  
+                .permitAll() // 모두 허용
+
+                // 권한이 필요한 요청 설정
+                // ManagementController
+                .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
+
+                .requestMatchers(HttpMethod.GET, "/api/v1/management/**").hasAnyAuthority(Permission.ADMIN_READ.name(), Permission.MANAGER_READ.name())
+                .requestMatchers(HttpMethod.POST, "/api/v1/management/**").hasAnyAuthority(Permission.ADMIN_CREATE.name(), Permission.MANAGER_CREATE.name())
+                .requestMatchers(HttpMethod.PUT, "/api/v1/management/**").hasAnyAuthority(Permission.ADMIN_UPDATE.name(), Permission.MANAGER_UPDATE.name())
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/management/**").hasAnyAuthority(Permission.ADMIN_DELETE.name(), Permission.MANAGER_DELETE.name())
+
+                // AdminController
+                // 주석 부분의 동작을 Annotation으로 똑같이 구현 가능
+//                .requestMatchers("/api/v1/admin").hasAnyRole(ADMIN.name())
+//
+//                .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAnyAuthority(Permission.ADMIN_READ.name())
+//                .requestMatchers(HttpMethod.POST, "/api/v1/admin/**").hasAnyAuthority(Permission.ADMIN_CREATE.name())
+//                .requestMatchers(HttpMethod.PUT, "/api/v1/admin/**").hasAnyAuthority(Permission.ADMIN_UPDATE.name())
+//                .requestMatchers(HttpMethod.DELETE, "/api/v1/admin/**").hasAnyAuthority(Permission.ADMIN_DELETE.name())
+
                 .anyRequest() // 그 외의 모든 요청은  
                 .authenticated() // 인증 필요  
                 .and()
