@@ -42,7 +42,7 @@ public class AuthenticationService {
                 .lastname(request.getLastname())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
+                .role(request.getRole()) // 동적 할당
                 .build();
 
         // 사용자 저장
